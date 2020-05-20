@@ -1,9 +1,14 @@
-SET(PROJECT_NAME DSO)
 
-PROJECT(${PROJECT_NAME})
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
-#set(CMAKE_VERBOSE_MAKEFILE ON)
 
+if(NOT CMAKE_TOOLCHAIN_FILE)
+	set(CMAKE_TOOLCHAIN_FILE "/home/fengchen/Downloads/Library/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
+endif(CMAKE_TOOLCHAIN_FILE)
+
+set(PROJECT_NAME DSO)
+project(${PROJECT_NAME})
+
+#set(CMAKE_VERBOSE_MAKEFILE ON)
 
 set(BUILD_TYPE Release)
 #set(BUILD_TYPE RelWithDebInfo)
@@ -12,10 +17,12 @@ set(EXECUTABLE_OUTPUT_PATH bin)
 set(LIBRARY_OUTPUT_PATH lib)
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
+
+
 # required libraries
 find_package(SuiteParse REQUIRED)
 find_package(Eigen3 REQUIRED)
-find_package(Boost COMPONENTS system thread) 
+find_package(Boost REQUIRED COMPONENTS system thread)#) 
 
 # optional libraries
 find_package(LibZip QUIET)
@@ -62,6 +69,7 @@ include_directories(
   ${PROJECT_SOURCE_DIR}/thirdparty/Sophus
   ${PROJECT_SOURCE_DIR}/thirdparty/sse2neon
   ${EIGEN3_INCLUDE_DIR}
+  ${Boost_INCLUDE_DIRS}
 ) 
 
 
@@ -126,7 +134,8 @@ if (OpenCV_FOUND AND Pangolin_FOUND)
 	message("--- compiling dso_dataset.")
 	set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_LIST_DIR}/bin)
 	add_executable(dso_dataset ${PROJECT_SOURCE_DIR}/src/main_dso_pangolin.cpp )
-    target_link_libraries(dso_dataset dso boost_system cxsparse ${BOOST_THREAD_LIBRARY} ${LIBZIP_LIBRARY} ${Pangolin_LIBRARIES} ${OpenCV_LIBS})
+	# target_link_libraries(dso_dataset dso boost_system cxsparse ${BOOST_THREAD_LIBRARY} ${LIBZIP_LIBRARY} ${Pangolin_LIBRARIES} ${OpenCV_LIBS})
+	target_link_libraries(dso_dataset dso cxsparse ${Boost_LIBRARIES} ${LIBZIP_LIBRARY} ${Pangolin_LIBRARIES} ${OpenCV_LIBS})
 else()
 	message("--- not building dso_dataset, since either don't have openCV or Pangolin.")
 endif()
